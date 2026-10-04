@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: swift test -j 2
+      - name: Build universal application
+        run: YT_GRAB_UNIVERSAL=1 ./Scripts/build-app.sh
+      - name: Verify architectures and signature
+        run: |
+          lipo -info build/YT-Grab.app/Contents/MacOS/YT-Grab
+          codesign --verify --deep --strict --verbose=2 build/YT-Grab.app
+      - name: Package application
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent build/YT-Grab.app build/YT-Grab-macOS-universal.zip
+          cd build
+          shasum -a 256 YT-Grab-macOS-universal.zip > YT-Grab-macOS-universal.zip.sha256
+      - name: Create universal DMG
+        run: ./Scripts/package-dmg.sh
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            build/YT-Grab-macOS-universal.zip \
+            build/YT-Grab-macOS-universal.zip.sha256 \
+            build/YT-Grab-macOS-universal.dmg \
+            build/YT-Grab-macOS-universal.dmg.sha256 \
+            --generate-notes \
+            --title "YT-Grab $GITHUB_REF_NAME"
