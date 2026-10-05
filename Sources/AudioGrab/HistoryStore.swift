@@ -3,14 +3,13 @@ import Foundation
 @MainActor
 final class HistoryStore: ObservableObject {
     @Published private(set) var items: [HistoryItem] = []
+    private let historyURL: URL
 
-    private var historyURL: URL {
+    init(historyURL: URL? = nil) {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return support.appendingPathComponent("YT-Grab", isDirectory: true)
+        self.historyURL = historyURL ?? support
+            .appendingPathComponent("YT-Grab", isDirectory: true)
             .appendingPathComponent("history.json")
-    }
-
-    init() {
         load()
     }
 
@@ -21,6 +20,11 @@ final class HistoryStore: ObservableObject {
 
     func clear() {
         items.removeAll()
+        save()
+    }
+
+    func remove(_ item: HistoryItem) {
+        items.removeAll { $0.id == item.id }
         save()
     }
 

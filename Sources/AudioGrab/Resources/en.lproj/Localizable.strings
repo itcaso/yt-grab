@@ -32,6 +32,13 @@
 "No Downloads Yet" = "No Downloads Yet";
 "Completed audio and video downloads will appear here." = "Completed audio and video downloads will appear here.";
 "File moved" = "File moved";
+"%d history items" = "%d history items";
+"Clear History" = "Clear History";
+"Remove from History" = "Remove from History";
+"Remove Download from History?" = "Remove Download from History?";
+"Clear All Download History?" = "Clear All Download History?";
+"Remove" = "Remove";
+"Downloaded files will not be deleted from your Mac." = "Downloaded files will not be deleted from your Mac.";
 "General" = "General";
 "Download Location" = "Download Location";
 "Choose…" = "Choose…";

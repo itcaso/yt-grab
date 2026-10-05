@@ -27,7 +27,7 @@ This test downloads MP3 and MP4 outputs, checks that they are nonempty, and asks
 Maintainers should update `CFBundleShortVersionString` and `CFBundleVersion` in `Support/Info.plist`, commit the change, and push a version tag:
 
 ```sh
-git tag v1.1.0
+git tag v1.2.0
 git push origin main --tags
 ```
 

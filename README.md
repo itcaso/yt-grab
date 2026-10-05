@@ -36,7 +36,8 @@ The release is universal and supports Intel and Apple Silicon Macs running macOS
 - Quality options based only on formats available in the analyzed media.
 - Video links and the selected quality are validated again immediately before downloading.
 - Animated download progress bar with a live percentage, speed and remaining time.
-- Progress, cancellation, download history, configurable destination and Finder integration.
+- Progress, cancellation, configurable destination and Finder integration.
+- Remove individual history entries or clear the entire history without deleting downloaded files.
 - A destination picker is available immediately before each download.
 - Dependency diagnostics, verified automatic installation of the official yt-dlp macOS executable, and guided FFmpeg installation.
 - Automatic English or Spanish interface based on the macOS language preference.

@@ -32,6 +32,13 @@
 "No Downloads Yet" = "Todavía no hay descargas";
 "Completed audio and video downloads will appear here." = "Las descargas de audio y video completadas aparecerán aquí.";
 "File moved" = "Archivo movido";
+"%d history items" = "%d elementos en el historial";
+"Clear History" = "Borrar historial";
+"Remove from History" = "Eliminar del historial";
+"Remove Download from History?" = "¿Eliminar la descarga del historial?";
+"Clear All Download History?" = "¿Borrar todo el historial de descargas?";
+"Remove" = "Eliminar";
+"Downloaded files will not be deleted from your Mac." = "Los archivos descargados no se eliminarán de tu Mac.";
 "General" = "General";
 "Download Location" = "Ubicación de descarga";
 "Choose…" = "Elegir…";

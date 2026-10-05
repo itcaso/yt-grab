@@ -20,7 +20,7 @@ body:
     id: version
     attributes:
       label: YT-Grab version
-      placeholder: "1.1.0"
+      placeholder: "1.2.0"
     validations:
       required: true
   - type: textarea

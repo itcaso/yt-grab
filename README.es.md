@@ -36,7 +36,8 @@ La versión publicada es universal y funciona en Macs Intel y Apple Silicon con 
 - Calidades basadas únicamente en los formatos disponibles en el contenido analizado.
 - El enlace de video y la calidad seleccionada se validan nuevamente justo antes de descargar.
 - Barra de progreso animada con porcentaje, velocidad y tiempo restante.
-- Progreso, cancelación, historial, destino configurable e integración con Finder.
+- Progreso, cancelación, destino configurable e integración con Finder.
+- Elimina elementos individuales del historial o bórralo por completo sin eliminar los archivos descargados.
 - Selector de destino disponible justo antes de iniciar cada descarga.
 - Diagnóstico de dependencias, instalación automática verificada del ejecutable oficial de yt-dlp y guía para instalar FFmpeg.
 - Interfaz automática en español o inglés según el idioma configurado en macOS.
