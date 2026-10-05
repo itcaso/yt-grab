@@ -134,6 +134,7 @@ final class AppModel: ObservableObject {
         let selectedAudioQuality = audioQuality
         let selectedVideoFormat = videoFormat
         let selectedDestination = destination
+        let shouldDeleteTemporaryFiles = settings.deleteTemporaryFiles
 
         operation?.cancel()
         operation = Task {
@@ -166,7 +167,8 @@ final class AppModel: ObservableObject {
                     audioQuality: selectedAudioQuality,
                     videoFormat: selectedVideoFormat,
                     videoQuality: selectedVideoQuality,
-                    destination: selectedDestination
+                    destination: selectedDestination,
+                    deleteTemporaryFiles: shouldDeleteTemporaryFiles
                 )
                 let detail = selectedType == .audio
                     ? "\(selectedAudioFormat.rawValue) · \(selectedAudioQuality.title)"

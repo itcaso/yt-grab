@@ -11,6 +11,7 @@ struct YTDLPArgumentBuilderTests {
         let arguments = YTDLPArgumentBuilder.analysis(url: url)
         #expect(arguments.last == url.absoluteString)
         #expect(arguments.contains("--dump-single-json"))
+        #expect(arguments.contains("--ignore-config"))
         #expect(!arguments.contains("sh"))
         #expect(!arguments.contains("-c"))
     }
@@ -22,6 +23,9 @@ struct YTDLPArgumentBuilderTests {
         #expect(value(after: "--audio-quality", in: arguments) == "320K")
         #expect(value(after: "--paths", in: arguments) == destination.path)
         #expect(value(after: "--ffmpeg-location", in: arguments) == ffmpeg.path)
+        #expect(!arguments.contains("--keep-video"))
+        #expect(arguments.contains("--ignore-config"))
+        #expect(value(after: "--progress-template", in: arguments)?.hasPrefix("download:download:") == true)
     }
 
     @Test func m4aArgumentsPreserveM4AOutput() {
@@ -80,11 +84,42 @@ struct YTDLPArgumentBuilderTests {
         #expect(!metadata.supports(videoQuality: .height(720)))
     }
 
+    @Test func directMP4WithoutCodecMetadataIsStillRecognizedAsVideo() {
+        let format = MediaFormat(
+            formatID: "direct",
+            extensionName: "mp4",
+            width: nil,
+            height: nil,
+            fps: nil,
+            videoCodec: nil,
+            audioCodec: nil,
+            fileSize: nil,
+            approximateFileSize: nil
+        )
+        #expect(format.hasVideo)
+    }
+
+    @Test func keepingTemporaryFilesAddsYTDLPFlag() {
+        let configuration = makeConfiguration(type: .video, deleteTemporaryFiles: false)
+        let arguments = YTDLPArgumentBuilder.video(configuration: configuration, ffmpegLocation: ffmpeg)
+        #expect(arguments.contains("--keep-video"))
+    }
+
+    @Test func progressParserDistinguishesVideoAndAudioStreams() {
+        let video = YTDLPProgressParser.parse("download: 62.0%|2.1MiB/s|00:07|avc1.640028|none", type: .video)
+        let audio = YTDLPProgressParser.parse("download: 91.0%|1.0MiB/s|00:01|none|mp4a.40.2", type: .video)
+        #expect(video?.stage == .downloadingVideo)
+        #expect(video?.fraction == 0.62)
+        #expect(audio?.stage == .downloadingAudio)
+        #expect(audio?.fraction == 0.91)
+    }
+
     private func makeConfiguration(
         type: DownloadType,
         audioFormat: AudioFormat = .mp3,
         audioQuality: AudioQuality = .kbps320,
-        videoQuality: VideoQuality = .best
+        videoQuality: VideoQuality = .best,
+        deleteTemporaryFiles: Bool = true
     ) -> DownloadConfiguration {
         DownloadConfiguration(
             url: url,
@@ -93,7 +128,8 @@ struct YTDLPArgumentBuilderTests {
             audioQuality: audioQuality,
             videoFormat: .mp4,
             videoQuality: videoQuality,
-            destination: destination
+            destination: destination,
+            deleteTemporaryFiles: deleteTemporaryFiles
         )
     }
 

@@ -3,6 +3,7 @@ import Foundation
 enum YTDLPArgumentBuilder {
     static func analysis(url: URL) -> [String] {
         [
+            "--ignore-config",
             "--dump-single-json",
             "--no-playlist",
             "--no-color",
@@ -14,7 +15,7 @@ enum YTDLPArgumentBuilder {
 
     static func audio(configuration: DownloadConfiguration, ffmpegLocation: URL? = nil) -> [String] {
         var arguments = commonDownloadArguments(
-            destination: configuration.destination,
+            configuration: configuration,
             ffmpegLocation: ffmpegLocation
         )
 
@@ -39,7 +40,7 @@ enum YTDLPArgumentBuilder {
 
     static func video(configuration: DownloadConfiguration, ffmpegLocation: URL? = nil) -> [String] {
         var arguments = commonDownloadArguments(
-            destination: configuration.destination,
+            configuration: configuration,
             ffmpegLocation: ffmpegLocation
         )
         let selector: String
@@ -60,19 +61,23 @@ enum YTDLPArgumentBuilder {
         return arguments
     }
 
-    private static func commonDownloadArguments(destination: URL, ffmpegLocation: URL?) -> [String] {
+    private static func commonDownloadArguments(configuration: DownloadConfiguration, ffmpegLocation: URL?) -> [String] {
         var arguments = [
+            "--ignore-config",
             "--no-playlist",
             "--newline",
             "--progress",
-            "--progress-template", "download:%(progress._percent_str)s|%(progress.speed)s|%(progress.eta)s",
+            "--progress-template", "download:download:%(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s|%(info.vcodec)s|%(info.acodec)s",
             "--print", "after_move:filepath:%(filepath)s",
-            "--paths", destination.path,
+            "--paths", configuration.destination.path,
             "--output", "%(title)s.%(ext)s",
             "--windows-filenames"
         ]
         if let ffmpegLocation {
             arguments += ["--ffmpeg-location", ffmpegLocation.path]
+        }
+        if !configuration.deleteTemporaryFiles {
+            arguments.append("--keep-video")
         }
         return arguments
     }

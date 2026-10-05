@@ -7,6 +7,41 @@ struct DownloadProgress: Sendable {
     let eta: String?
 }
 
+enum YTDLPProgressParser {
+    static func parse(_ line: String, type: DownloadType) -> DownloadProgress? {
+        guard line.hasPrefix("download:") else { return nil }
+        let fields = String(line.dropFirst("download:".count))
+            .split(separator: "|", omittingEmptySubsequences: false)
+            .map(String.init)
+        guard let percentField = fields.first else { return nil }
+
+        let rawPercent = percentField
+            .replacingOccurrences(of: "%", with: "")
+            .trimmingCharacters(in: .whitespaces)
+        let fraction = Double(rawPercent).map { min(max($0 / 100, 0), 1) }
+        let speed = fields.count > 1 ? normalized(fields[1]) : nil
+        let eta = fields.count > 2 ? normalized(fields[2]) : nil
+        let videoCodec = fields.count > 3 ? normalized(fields[3])?.lowercased() : nil
+        let audioCodec = fields.count > 4 ? normalized(fields[4])?.lowercased() : nil
+
+        let stage: DownloadStage
+        if type == .audio {
+            stage = .downloading
+        } else if videoCodec == "none" {
+            stage = audioCodec == "none" ? .downloadingVideo : .downloadingAudio
+        } else {
+            stage = .downloadingVideo
+        }
+        return DownloadProgress(stage: stage, fraction: fraction, speed: speed, eta: eta)
+    }
+
+    private static func normalized(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed.uppercased() != "NA" else { return nil }
+        return trimmed
+    }
+}
+
 enum YTDLPServiceError: LocalizedError {
     case missingYTDLP
     case missingFFmpeg
@@ -85,14 +120,8 @@ final class YTDLPService: @unchecked Sendable {
                 progress(DownloadProgress(stage: .merging, fraction: nil, speed: nil, eta: nil))
             } else if lower.contains("extractaudio") || lower.contains("post-process") {
                 progress(DownloadProgress(stage: .processing, fraction: nil, speed: nil, eta: nil))
-            } else if line.hasPrefix("download:") {
-                let fields = String(line.dropFirst("download:".count)).split(separator: "|", omittingEmptySubsequences: false)
-                let rawPercent = fields.first.map(String.init)?.replacingOccurrences(of: "%", with: "").trimmingCharacters(in: .whitespaces)
-                let fraction = rawPercent.flatMap(Double.init).map { min(max($0 / 100, 0), 1) }
-                let speed = fields.count > 1 ? String(fields[1]) : nil
-                let eta = fields.count > 2 ? String(fields[2]) : nil
-                let stage: DownloadStage = configuration.type == .video ? .downloadingVideo : .downloading
-                progress(DownloadProgress(stage: stage, fraction: fraction, speed: speed, eta: eta))
+            } else if let update = YTDLPProgressParser.parse(line, type: configuration.type) {
+                progress(update)
             }
         }
 

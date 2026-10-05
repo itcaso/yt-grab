@@ -72,7 +72,10 @@ struct MediaFormat: Codable, Hashable, Identifiable {
     let approximateFileSize: Int64?
 
     var id: String { formatID }
-    var hasVideo: Bool { videoCodec != nil && videoCodec != "none" }
+    var hasVideo: Bool {
+        if let videoCodec { return videoCodec != "none" }
+        return ["mp4", "mov", "mkv", "webm"].contains(extensionName?.lowercased() ?? "")
+    }
     var hasAudio: Bool { audioCodec != nil && audioCodec != "none" }
 }
 
@@ -150,4 +153,5 @@ struct DownloadConfiguration {
     let videoFormat: VideoFormat
     let videoQuality: VideoQuality
     let destination: URL
+    let deleteTemporaryFiles: Bool
 }

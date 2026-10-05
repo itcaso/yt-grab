@@ -11,6 +11,17 @@ Thank you for helping improve YT-Grab.
 
 Downloads must remain limited to content the user owns or is authorized to save.
 
+## Optional end-to-end test
+
+The normal test suite does not access the network. To verify real audio and video output against media you own or are authorized to use, serve that media over HTTP and run:
+
+```sh
+YT_GRAB_E2E_URL="http://127.0.0.1:8000/authorized-demo.mp4" \
+  swift test -j 2 --filter authorizedLocalMediaDownloadsAsAudioAndVideo
+```
+
+This test downloads MP3 and MP4 outputs, checks that they are nonempty, and asks FFmpeg to decode the audio stream plus the final video's audio and video streams.
+
 ## Publishing a release
 
 Maintainers should update `CFBundleShortVersionString` and `CFBundleVersion` in `Support/Info.plist`, commit the change, and push a version tag:
